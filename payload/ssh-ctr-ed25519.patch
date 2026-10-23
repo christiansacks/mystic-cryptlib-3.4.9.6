@@ -1,0 +1,29 @@
+--- a/session/ssh2_algo.c	2026-10-23 10:32:39.952333284 +0100
++++ b/session/ssh2_algo.c	2026-10-23 10:41:44.383808100 +0100
+@@ -1138,8 +1138,12 @@
+ 		if( !algoAvailable( algoStringInfo->algo ) )
+ 			continue;
+ 
+-		/* Make sure that any required sub-algorithms are available */
+-		if( algoStringInfo->subAlgo != CRYPT_ALGO_NONE && \
++		/* Make sure that any required sub-algorithms are available.  For
++		   conventional algorithms the sub-algorithm is an encryption mode,
++		   not an algorithm, so we can't check it (this is the same as the
++		   check in the read-side code) */
++		if( !isConvAlgo( algoStringInfo->algo ) && \
++			algoStringInfo->subAlgo != CRYPT_ALGO_NONE && \
+ 			!algoAvailable( algoStringInfo->subAlgo ) )
+ 			continue;
+ 
+--- a/misc/config.h	2026-10-23 10:32:39.947333373 +0100
++++ b/misc/config.h	2026-10-23 11:04:59.087703925 +0100
+@@ -777,6 +777,9 @@
+ #define USE_SCEP
+ #define USE_SCVP
+ #define USE_SSH
++#define USE_SSH_CTR
++#define USE_X25519
++#define USE_ED25519
+ #define USE_TLS
+ #define USE_TSP
+ 
