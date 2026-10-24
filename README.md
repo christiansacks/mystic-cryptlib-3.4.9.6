@@ -69,5 +69,12 @@ temporary build directory is removed on success.
 * RSA host key (what Mystic generates) means DH group-exchange key exchange.
   No GCM/ChaCha20 or post-quantum key exchange; OpenSSH will still print its
   post-quantum warning.
-* To support a newer Cryptlib later, see `UPGRADING.md`
+* To support a newer Cryptlib later, see `../cryptlib-build/UPGRADING.md`
   (regenerate `payload/maps.h`, re-check the patches).
+
+## NetRunner
+
+The same shim and library also work for NetRunner (Mystic's client): copy
+`libcl.so` (the shim) and `libcl_real.so` from `dist/<arch>` into a `libs/` directory
+next to the `netrunner` binary and run it from there. See `../netrunner-ssh/README.md`.
+The installer itself does not install into NetRunner.
