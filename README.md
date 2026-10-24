@@ -76,5 +76,4 @@ temporary build directory is removed on success.
 
 The same shim and library also work for NetRunner (Mystic's client): copy
 `libcl.so` (the shim) and `libcl_real.so` from `dist/<arch>` into a `libs/` directory
-next to the `netrunner` binary and run it from there. See `../netrunner-ssh/README.md`.
-The installer itself does not install into NetRunner.
+next to the `netrunner` binary and run it from there.
