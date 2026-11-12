@@ -64,8 +64,9 @@ temporary build directory is removed on success.
 
 ## Limits
 
-* Linux only. Tested on x86-64 with Mystic 1.12 A49; the other architectures
-  Mystic supports should build but are untested.
+* This installer is Linux only. Tested on x86-64 with Mystic 1.12 A49; the
+  other architectures Mystic supports should build but are untested.
+  **Windows (32-bit):** see [`windows/README.md`](windows/README.md).
 * RSA host key (what Mystic generates) means DH group-exchange key exchange.
   No GCM/ChaCha20 or post-quantum key exchange; OpenSSH will still print its
   post-quantum warning.
