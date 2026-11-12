@@ -1,0 +1,53 @@
+--- a/session/ssh2_authsvr.c
++++ b/session/ssh2_authsvr.c
+@@ -547,7 +547,8 @@
+ 		/* If we've already processed a query message then any subsequent 
+ 		   message has to be an actual authentication message (A2, B2, C2) */
+ 		if( currentAuthType == SSH_AUTHTYPE_QUERY )
+-			return( CRYPT_ERROR_DUPLICATE );
++			return( CRYPT_OK );		/* Mystic patch: "none" then an unoffered 
++									   method, both handled as queries */
+ 
+ 		/* A query must be followed by a standard authentication method.  
+ 		   This also catches the previous case but we special-case it to 
+@@ -1160,6 +1161,17 @@
+ 	ENSURES( i < authTypeInfoTblSize );
+ 	if( authTypeInfoPtr == NULL )
+ 		{
++		/* Mystic BBS patch: a method that we don't offer (typically 
++		   "publickey" when there's no public-key keyset) is answered like 
++		   the "none" query, with a failure response listing the methods 
++		   that can continue (RFC 4252 section 5.1), instead of dropping the 
++		   connection.  Clients such as SyncTERM try "publickey" first and 
++		   then fall back to "password" */
++		authTypeInfoPtr = &authTypeInfoTblPtr[ 0 ];
++		ENSURES( authTypeInfoPtr->type == SSH_AUTHTYPE_QUERY );
++		}
++	if( authTypeInfoPtr == NULL )
++		{
+ 		zeroise( authInfo->password, CRYPT_MAX_TEXTSIZE );
+ 				 /* Need to keep other fields intact for error message */
+ 
+@@ -1999,6 +2011,22 @@
+ 									AUTHSTATE_IN_PROGRESS );
+ 			}
+ 		if( authInfo.status == OK_SPECIAL && \
++			authInfo.userAuthInfo == USERAUTH_NOOP )
++			{
++			/* Mystic patch: a second query ("none" followed by an 
++			   unoffered method such as "publickey"), allow one more */
++			authInfo.status = processUserAuth( sessionInfoPtr, handshakeInfo,
++									&authInfo.userAuthInfo, 
++									CREDENTIAL_USERNAME_PRESENT, 
++									AUTHSTATE_IN_PROGRESS );
++			if( authInfo.status == OK_SPECIAL && \
++				authInfo.userAuthInfo == USERAUTH_NOOP )
++				{
++				authInfo.status = CRYPT_ERROR_INVALID;
++				authInfo.userAuthInfo = USERAUTH_ERROR;
++				}
++			}
++		if( authInfo.status == OK_SPECIAL && \
+ 			authInfo.userAuthInfo == USERAUTH_NOOP_2 )
+ 			{
+ 			/* It was yet another a dummy read, try again.  At this point 
